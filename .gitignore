@@ -1,0 +1,26 @@
+# Python
+.venv/
+__pycache__/
+*.py[cod]
+.pytest_cache/
+
+# Environment variables
+.env
+
+# Generated data and ML models
+*.csv
+*.joblib
+*.pkl
+
+# STM32CubeIDE build output
+Debug/
+Release/
+*.elf
+*.map
+*.list
+
+# IDE and operating system
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
