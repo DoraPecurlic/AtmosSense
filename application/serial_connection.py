@@ -1,7 +1,7 @@
 import serial
 
 class SerialConnection:
-    def __init__(self,port: str,baud_rate: int = 115200,timeout: float = 2.0,) -> None:
+    def __init__(self, port: str, baud_rate:int = 115200,timeout: float = 2.0,) -> None:
         self._port = port
         self._baud_rate = baud_rate
         self._timeout = timeout
