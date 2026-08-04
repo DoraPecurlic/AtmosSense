@@ -21,7 +21,7 @@
 
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
-#include <stdio.h>
+#include "serial_telemetry.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -47,8 +47,21 @@ UART_HandleTypeDef huart2;
 /* USER CODE BEGIN PV */
 #define TELEMETRY_MESSAGE_BUFFER_SIZE 128U
 
-static char telemetryMessage[TELEMETRY_MESSAGE_BUFFER_SIZE];
-static uint32_t telemetrySequenceNumber = 0U;
+
+static SerialTelemetryReading telemetryReading =
+{
+    .temperatureC = 24.50f,
+    .humidityPercent = 48.20f,
+    .pressureHpa = 1013.25f,
+    .gasResistanceOhm = 125000U,
+
+    .clearRaw = 850U,
+    .redRaw = 310U,
+    .greenRaw = 420U,
+    .blueRaw = 275U,
+    .proximityRaw = 12U
+};
+
 
 /* USER CODE END PV */
 
@@ -98,7 +111,7 @@ int main(void)
   MX_I2C1_Init();
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
-
+  SerialTelemetry_Init(&huart2);
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -108,27 +121,12 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-	  telemetrySequenceNumber++;
-	  int messageLength = snprintf(
-	          telemetryMessage,
-	          sizeof(telemetryMessage),
-	          "DATA,%lu,%lu,24.50,48.20,1013.25,"
-	          "125000,850,310,420,275,12\r\n",
-	          (unsigned long)telemetrySequenceNumber,
-	          (unsigned long)HAL_GetTick()
-	      );
-	  if ((messageLength > 0) &&
-	          ((size_t)messageLength < sizeof(telemetryMessage)))
-	      {
-	          HAL_UART_Transmit(
-	              &huart2,
-	              (uint8_t *)telemetryMessage,
-	              (uint16_t)messageLength,
-	              HAL_MAX_DELAY
-	          );
-	      }
+	  if (SerialTelemetry_Send(&telemetryReading) != HAL_OK)
+	  {
+	      Error_Handler();
+	  }
 
-	      HAL_Delay(1000U);
+	  HAL_Delay(1000U);
   }
   /* USER CODE END 3 */
 }

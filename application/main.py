@@ -1,7 +1,6 @@
-import time
+
 from pathlib import Path
 
-from sensor_simulation import SensorSimulator
 from csv_storage import CsvStorage
 from mqtt_publisher import MqttPublisher
 
