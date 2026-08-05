@@ -45,7 +45,7 @@ class DatabaseStorage:
             return
 
         try:
-           self._connection = psycopg.connect(host = self._host, port = self._port, dbname = self._database, user = self._user, password = self._password)  
+           self._connection = psycopg.connect(host = self._host, port = self._port, dbname = self._database, user = self._user, password = self._password, connect_timeout = 5)  
 
         except psycopg.Error as error:
             raise ConnectionError("Unable to connect to PostgreSQL") from error
@@ -76,6 +76,7 @@ class DatabaseStorage:
             with self._connection.cursor() as cursor:
                 cursor.execute(self._INSERT_QUERY, values)
             self._connection.commit()
+            print("subs saved")
         except psycopg.Error as error:
             raise RuntimeError("Could not save measurements to database")
 
