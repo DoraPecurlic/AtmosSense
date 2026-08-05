@@ -19,4 +19,4 @@ class SensorReading:
     proximity_raw: int
 
 
-    recieved_at: datetime = field( default_factory=lambda: datetime.now().astimezone())
+    received_at: datetime = field( default_factory=lambda: datetime.now().astimezone())

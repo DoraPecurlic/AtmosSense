@@ -13,7 +13,7 @@ class CsvStorage:
     def save(self, reading: SensorReading) -> None:
         row = asdict(reading) # data klasu pretvara u rijecnik
 
-        row["recieved_at"] = reading.recieved_at.strftime("%Y-%m-%d %H:%M:%S")
+        row["received_at"] = reading.received_at.strftime("%Y-%m-%d %H:%M:%S")
 
         file_has_data = (self._file_path.exists() and self._file_path.stat().st_size > 0)
 

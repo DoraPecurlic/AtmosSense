@@ -21,7 +21,7 @@ class MqttPublisher:
     def publish(self, data: SensorReading) -> None:
         payload_data = asdict(data)
 
-        payload_data["recieved_at"] = data.recieved_at.strftime("%Y-%m-%d %H:%M:%S")
+        payload_data["received_at"] = data.received_at.strftime("%Y-%m-%d %H:%M:%S")
 
         payload = json.dumps(payload_data)
 
