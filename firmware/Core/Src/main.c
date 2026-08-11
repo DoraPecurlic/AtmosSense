@@ -22,6 +22,7 @@
 /* Private includes ----------------------------------------------------------*/
 /* USER CODE BEGIN Includes */
 #include "serial_telemetry.h"
+#include "display_view.h"
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -109,9 +110,27 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
+
+
+
+
+
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   SerialTelemetry_Init(&huart2);
+
+
+
+
+
+  DisplayView_Init();
+
+
+
+
+  DisplayView_ShowStartup();
+  HAL_Delay(2000U);
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
@@ -121,6 +140,8 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+   DisplayView_ShowEnvironment(&telemetryReading);
+
 	  if (SerialTelemetry_Send(&telemetryReading) != HAL_OK)
 	  {
 	      Error_Handler();
