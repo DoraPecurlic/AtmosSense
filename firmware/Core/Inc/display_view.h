@@ -14,6 +14,6 @@ void DisplayView_Init(void);
 
 void DisplayView_ShowStartup(void);
 void DisplayView_ShowEnvironment(const SerialTelemetryReading *reading);
-
+void DisplayView_ShowLight(const SerialTelemetryReading *reading);
 
 #endif /* INC_DISPLAY_VIEW_H_ */

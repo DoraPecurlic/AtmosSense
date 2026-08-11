@@ -58,15 +58,14 @@ void DisplayView_ShowEnvironment(const SerialTelemetryReading *reading)
 
 	 ssd1306_Fill(Black);
 	 ssd1306_SetCursor(0U, 0U);
-	 ssd1306_WriteString("ATMOSSENSE", Font_6x8, White);
+	 ssd1306_WriteString("ENVIRONMENT", Font_6x8, White);
 
 	 ssd1306_SetCursor(110U, 0U);
 	 ssd1306_WriteString("1/2", Font_6x8, White);
 
 	 ssd1306_Line(0U, 10U, 127U, 10U, White);
 
-	 ssd1306_SetCursor(0U, 13U);
-	 ssd1306_WriteString("ENVIRONMENT", Font_6x8, White);
+
 
 	 snprintf(textBuffer, sizeof(textBuffer), "Temperature: %.1fC", reading ->temperatureC);
 
@@ -93,3 +92,61 @@ void DisplayView_ShowEnvironment(const SerialTelemetryReading *reading)
 	 ssd1306_UpdateScreen();
 
 }
+
+void DisplayView_ShowLight(const SerialTelemetryReading *reading)
+{
+
+    if (reading == NULL)
+    {
+        return;
+    }
+
+    char textBuffer[DISPLAY_TEXT_BUFFER_SIZE];
+    ssd1306_Fill(Black);
+
+
+    ssd1306_SetCursor(0U, 0U);
+    ssd1306_WriteString("LIGHT", Font_6x8, White);
+
+    ssd1306_SetCursor(110U, 0U);
+    ssd1306_WriteString("2/2", Font_6x8, White);
+
+    ssd1306_Line(0U, 10U, 127U, 10U, White);
+
+
+
+    snprintf(textBuffer,sizeof(textBuffer),"Clear: %u",(unsigned int)reading->clearRaw);
+    ssd1306_SetCursor(0U, 17U);
+    ssd1306_WriteString(textBuffer, Font_6x8, White);
+
+    snprintf(textBuffer,sizeof(textBuffer),"Red: %u",(unsigned int)reading->redRaw);
+    ssd1306_SetCursor(0U, 25U);
+    ssd1306_WriteString(textBuffer, Font_6x8, White);
+
+    snprintf(textBuffer,sizeof(textBuffer),"Green: %u",(unsigned int)reading->greenRaw);
+    ssd1306_SetCursor(0U, 35U);
+    ssd1306_WriteString(textBuffer, Font_6x8, White);
+
+    snprintf(textBuffer,sizeof(textBuffer),"Blue: %u",(unsigned int)reading->blueRaw);
+    ssd1306_SetCursor(0U, 45U);
+    ssd1306_WriteString(textBuffer, Font_6x8, White);
+
+
+    snprintf(textBuffer,sizeof(textBuffer),"Proximity: %u",(unsigned int)reading->proximityRaw);
+    ssd1306_SetCursor(0U, 56U);
+    ssd1306_WriteString(textBuffer, Font_6x8, White);
+
+    ssd1306_UpdateScreen();
+
+}
+
+
+
+
+
+
+
+
+
+
+

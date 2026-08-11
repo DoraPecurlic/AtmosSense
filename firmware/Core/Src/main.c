@@ -27,6 +27,11 @@
 
 /* Private typedef -----------------------------------------------------------*/
 /* USER CODE BEGIN PTD */
+typedef enum
+{
+	DISPLAY_PAGE_ENVIRONMENT = 0,
+	DISPLAY_PAGE_LIGHT
+}DisplayPage;
 
 /* USER CODE END PTD */
 
@@ -63,6 +68,8 @@ static SerialTelemetryReading telemetryReading =
     .proximityRaw = 12U
 };
 
+
+static volatile DisplayPage currentPage = DISPLAY_PAGE_ENVIRONMENT;
 
 /* USER CODE END PV */
 
@@ -110,11 +117,6 @@ int main(void)
   /* Initialize all configured peripherals */
   MX_GPIO_Init();
   MX_I2C1_Init();
-
-
-
-
-
   MX_USART2_UART_Init();
   /* USER CODE BEGIN 2 */
   SerialTelemetry_Init(&huart2);
@@ -140,14 +142,19 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
-   DisplayView_ShowEnvironment(&telemetryReading);
-
-	  if (SerialTelemetry_Send(&telemetryReading) != HAL_OK)
-	  {
-	      Error_Handler();
-	  }
-
-	  HAL_Delay(1000U);
+    if(currentPage == DISPLAY_PAGE_ENVIRONMENT)
+    {
+    	DisplayView_ShowEnvironment(&telemetryReading);
+    }
+    else
+    {
+    	DisplayView_ShowLight(&telemetryReading);
+    }
+    if (SerialTelemetry_Send(&telemetryReading) != HAL_OK)
+    {
+    	Error_Handler();
+    }
+    HAL_Delay(1000U);
   }
   /* USER CODE END 3 */
 }
@@ -267,13 +274,25 @@ static void MX_USART2_UART_Init(void)
   */
 static void MX_GPIO_Init(void)
 {
+  GPIO_InitTypeDef GPIO_InitStruct = {0};
   /* USER CODE BEGIN MX_GPIO_Init_1 */
 
   /* USER CODE END MX_GPIO_Init_1 */
 
   /* GPIO Ports Clock Enable */
+  __HAL_RCC_GPIOC_CLK_ENABLE();
   __HAL_RCC_GPIOA_CLK_ENABLE();
   __HAL_RCC_GPIOB_CLK_ENABLE();
+
+  /*Configure GPIO pin : PC13 */
+  GPIO_InitStruct.Pin = GPIO_PIN_13;
+  GPIO_InitStruct.Mode = GPIO_MODE_IT_RISING;
+  GPIO_InitStruct.Pull = GPIO_NOPULL;
+  HAL_GPIO_Init(GPIOC, &GPIO_InitStruct);
+
+  /* EXTI interrupt init*/
+  HAL_NVIC_SetPriority(EXTI15_10_IRQn, 0, 0);
+  HAL_NVIC_EnableIRQ(EXTI15_10_IRQn);
 
   /* USER CODE BEGIN MX_GPIO_Init_2 */
 
@@ -281,7 +300,34 @@ static void MX_GPIO_Init(void)
 }
 
 /* USER CODE BEGIN 4 */
+void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
+{
+	static uint32_t lastButtonPressMs = 0U;
 
+	if (GPIO_Pin != GPIO_PIN_13)
+	{
+	        return;
+	}
+
+	uint32_t currentTimeMs = HAL_GetTick();
+
+	if ((currentTimeMs - lastButtonPressMs) < 200U)
+	{
+		 return;
+	}
+
+	lastButtonPressMs = currentTimeMs;
+
+	if (currentPage == DISPLAY_PAGE_ENVIRONMENT)
+	{
+	    currentPage = DISPLAY_PAGE_LIGHT;
+	}
+	else
+	{
+	    currentPage = DISPLAY_PAGE_ENVIRONMENT;
+	}
+
+}
 /* USER CODE END 4 */
 
 /**
