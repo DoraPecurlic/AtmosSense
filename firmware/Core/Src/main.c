@@ -133,6 +133,7 @@ int main(void)
   DisplayView_ShowStartup();
   HAL_Delay(2000U);
 
+
   /* USER CODE END 2 */
 
   /* Infinite loop */
