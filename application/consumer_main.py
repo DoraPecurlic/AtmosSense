@@ -30,6 +30,10 @@ def get_required_environment_variable(name: str) -> str:
 def main() -> None:
     load_dotenv(ENV_FILE_PATH)
 
+    mqtt_host = os.getenv("MQTT_HOST",MQTT_HOST)
+    mqtt_port = int( os.getenv( "MQTT_PORT",str(MQTT_PORT)))
+    mqtt_topic = os.getenv("MQTT_TOPIC", MQTT_TOPIC)
+
     storage = DatabaseStorage(
         host=get_required_environment_variable(
             "POSTGRES_HOST"
@@ -51,9 +55,9 @@ def main() -> None:
     )
 
     consumer = DatabaseConsumer(
-        host=MQTT_HOST,
-        port=MQTT_PORT,
-        topic=MQTT_TOPIC,
+        host=mqtt_host,
+        port=mqtt_port,
+        topic=mqtt_topic,
         storage=storage,
     )
     print("Connecting to PostgreSQL...", flush=True)
