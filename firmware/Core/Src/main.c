@@ -23,6 +23,10 @@
 /* USER CODE BEGIN Includes */
 #include "serial_telemetry.h"
 #include "display_view.h"
+#include "bme688_sensor.h"
+#include "apds9960.h"
+
+#include <stdio.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -37,7 +41,10 @@ typedef enum
 
 /* Private define ------------------------------------------------------------*/
 /* USER CODE BEGIN PD */
-
+#define APDS9960_I2C_ADDRESS       0x39U
+#define APDS9960_ID_REGISTER       0x92U
+#define APDS9960_EXPECTED_ID       0xABU
+#define APDS9960_I2C_TIMEOUT_MS    100U
 /* USER CODE END PD */
 
 /* Private macro -------------------------------------------------------------*/
@@ -56,18 +63,22 @@ UART_HandleTypeDef huart2;
 
 static SerialTelemetryReading telemetryReading =
 {
-    .temperatureC = 24.50f,
-    .humidityPercent = 48.20f,
-    .pressureHpa = 1013.25f,
-    .gasResistanceOhm = 125000U,
+    .temperatureC = 0U,
+    .humidityPercent = 0U,
+    .pressureHpa = 0U,
+    .gasResistanceOhm = 0U,
 
-    .clearRaw = 850U,
-    .redRaw = 310U,
-    .greenRaw = 420U,
-    .blueRaw = 275U,
-    .proximityRaw = 12U
+    .clearRaw = 0U,
+    .redRaw = 0U,
+    .greenRaw = 0U,
+    .blueRaw = 0U,
+    .proximityRaw = 0U
 };
 
+static APDS9960Reading apds9960Reading;
+
+
+static BME688Reading bme688Reading;
 
 static volatile DisplayPage currentPage = DISPLAY_PAGE_ENVIRONMENT;
 
@@ -84,7 +95,6 @@ static void MX_USART2_UART_Init(void);
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
-
 /* USER CODE END 0 */
 
 /**
@@ -123,6 +133,26 @@ int main(void)
 
 
 
+  if (BME688Sensor_Init(&hi2c1) != HAL_OK)
+  {
+      Error_Handler();
+  }
+
+  if (APDS9960Sensor_Init(&hi2c1) != HAL_OK)
+  {
+      static const uint8_t errorMessage[] =
+          "DEBUG,APDS9960_INIT_ERROR\r\n";
+
+      HAL_UART_Transmit(
+          &huart2,
+          (uint8_t *)errorMessage,
+          sizeof(errorMessage) - 1U,
+          HAL_MAX_DELAY
+      );
+
+      Error_Handler();
+  }
+
 
 
   DisplayView_Init();
@@ -143,6 +173,44 @@ int main(void)
     /* USER CODE END WHILE */
 
     /* USER CODE BEGIN 3 */
+	if (BME688Sensor_Read(&bme688Reading) != HAL_OK)
+	{
+	     Error_Handler();
+	}
+
+
+	telemetryReading.temperatureC = bme688Reading.temperatureC;
+	telemetryReading.humidityPercent = bme688Reading.humidityPercent;
+	telemetryReading.pressureHpa = bme688Reading.pressureHpa;
+	telemetryReading.gasResistanceOhm =  bme688Reading.gasResistanceOhm;
+
+
+	HAL_StatusTypeDef apdsStatus =
+	    APDS9960Sensor_Read(&apds9960Reading);
+
+	if (apdsStatus == HAL_OK)
+	{
+	    telemetryReading.clearRaw =
+	        apds9960Reading.clearRaw;
+
+	    telemetryReading.redRaw =
+	        apds9960Reading.redRaw;
+
+	    telemetryReading.greenRaw =
+	        apds9960Reading.greenRaw;
+
+	    telemetryReading.blueRaw =
+	        apds9960Reading.blueRaw;
+
+	    telemetryReading.proximityRaw =
+	        apds9960Reading.proximityRaw;
+	}
+	else if (apdsStatus != HAL_BUSY)
+	{
+	    Error_Handler();
+	}
+
+
     if(currentPage == DISPLAY_PAGE_ENVIRONMENT)
     {
     	DisplayView_ShowEnvironment(&telemetryReading);

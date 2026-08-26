@@ -1,5 +1,5 @@
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timezone
 
 
 @dataclass(frozen=True)
@@ -19,4 +19,4 @@ class SensorReading:
     proximity_raw: int
 
 
-    received_at: datetime = field( default_factory=lambda: datetime.now().astimezone())
+    received_at: datetime = field( default_factory=lambda: datetime.now(timezone.utc))

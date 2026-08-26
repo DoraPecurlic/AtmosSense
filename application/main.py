@@ -31,9 +31,8 @@ def main() -> None:
 
    try:
        publisher.connect()
-       readings_received = 0
 
-       while readings_received < 5:
+       while True:
            try:
                raw_message = connection.read_line()
                reading = parser.parse(raw_message)
@@ -43,9 +42,11 @@ def main() -> None:
            
            storage.save(reading)
            publisher.publish(reading)
-           readings_received += 1
-       
+           print(f"Reading #{reading.sequence_number} "f"saved and published.")
            
+   except KeyboardInterrupt:
+        print("\nStopping AtmosSense gateway...")
+
    finally:
         publisher.disconnect()
         connection.disconnect()
