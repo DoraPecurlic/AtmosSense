@@ -13,6 +13,8 @@ class DatabaseStorage:
             humidity_percent,
             pressure_hpa,
             gas_resistance_ohm,
+            gas_valid,
+            heater_stable,
             clear_raw,
             red_raw,
             green_raw,
@@ -22,8 +24,8 @@ class DatabaseStorage:
         )
         VALUES
         (
-            %s, %s, %s, %s, %s, %s,
-            %s, %s, %s, %s, %s, %s
+            %s, %s, %s, %s, %s, %s, %s,
+            %s, %s, %s, %s, %s, %s, %s
         )
     """
 
@@ -64,6 +66,8 @@ class DatabaseStorage:
             reading.humidity_percent,
             reading.pressure_hpa,
             reading.gas_resistance_ohm,
+            reading.gas_valid,
+            reading.heater_stable,
             reading.clear_raw,
             reading.red_raw,
             reading.green_raw,
@@ -76,9 +80,12 @@ class DatabaseStorage:
             with self._connection.cursor() as cursor:
                 cursor.execute(self._INSERT_QUERY, values)
             self._connection.commit()
-            print("subs saved")
+            print("subs saved!")
         except psycopg.Error as error:
-            raise RuntimeError("Could not save measurements to database")
+            if self._connection is not None:
+                self._connection.rollback()
+
+            raise RuntimeError("Could not save measurements to database") from error
 
 
     

@@ -67,7 +67,8 @@ static SerialTelemetryReading telemetryReading =
     .humidityPercent = 0U,
     .pressureHpa = 0U,
     .gasResistanceOhm = 0U,
-
+	.gasValid = 0U,
+	.heaterStable = 0U,
     .clearRaw = 0U,
     .redRaw = 0U,
     .greenRaw = 0U,
@@ -183,6 +184,8 @@ int main(void)
 	telemetryReading.humidityPercent = bme688Reading.humidityPercent;
 	telemetryReading.pressureHpa = bme688Reading.pressureHpa;
 	telemetryReading.gasResistanceOhm =  bme688Reading.gasResistanceOhm;
+	telemetryReading.gasValid = bme688Reading.gasValid;
+	telemetryReading.heaterStable = bme688Reading.heaterStable;
 
 
 	HAL_StatusTypeDef apdsStatus =

@@ -56,6 +56,9 @@ class DatabaseConsumer:
               pressure_hpa = float(payload_data["pressure_hpa"]),
               gas_resistance_ohm = float(payload_data["gas_resistance_ohm"]),
 
+              gas_valid=int(payload_data["gas_valid"]),
+              heater_stable=int(payload_data["heater_stable"]),
+
               clear_raw = int(payload_data["clear_raw"]),
               red_raw = int(payload_data["red_raw"]),
               green_raw = int(payload_data["green_raw"]),

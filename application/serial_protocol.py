@@ -5,7 +5,7 @@ class SerialProtocolError(ValueError):
 
 class SerialProtocol:
     DATA_MESSAGE_TYPE = "DATA"
-    DATA_FIELD_COUNT = 12
+    DATA_FIELD_COUNT = 14
 
     def parse(self, message: str) -> SensorReading:
         message = message.strip()
@@ -29,11 +29,13 @@ class SerialProtocol:
                 humidity_percent=float(fields[4]),
                 pressure_hpa=float(fields[5]),
                 gas_resistance_ohm=float(fields[6]),
-                clear_raw = int(fields[7]),
-                red_raw = int(fields[8]),
-                green_raw= int(fields[9]),
-                blue_raw= int(fields[10]),
-                proximity_raw= int(fields[11])
+                gas_valid=int(fields[7]),
+                heater_stable=int(fields[8]),
+                clear_raw = int(fields[9]),
+                red_raw = int(fields[10]),
+                green_raw= int(fields[11]),
+                blue_raw= int(fields[12]),
+                proximity_raw= int(fields[13])
             )
         except ValueError as error:
             raise SerialProtocolError("DATA message contains an invalid numeric value") from error

@@ -10,6 +10,12 @@ CREATE TABLE IF NOT EXISTS measurements
     pressure_hpa DOUBLE PRECISION NOT NULL,
     gas_resistance_ohm DOUBLE PRECISION NOT NULL,
 
+    gas_valid SMALLINT NOT NULL
+        CHECK (gas_valid IN (0,1)),
+
+    heater_stable SMALLINT NOT NULL
+        CHECK (heater_stable IN (0,1)),
+
     clear_raw INTEGER NOT NULL,
     red_raw INTEGER NOT NULL,
     green_raw INTEGER NOT NULL,
