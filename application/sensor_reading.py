@@ -12,6 +12,9 @@ class SensorReading:
     pressure_hpa: float
     gas_resistance_ohm: float
 
+    gas_valid: int
+    heater_stable: int
+
     clear_raw: int
     red_raw: int
     green_raw: int

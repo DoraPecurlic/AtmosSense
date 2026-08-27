@@ -17,6 +17,9 @@ typedef struct
 	float pressureHpa;
 	uint32_t gasResistanceOhm;
 
+	uint8_t gasValid;
+	uint8_t heaterStable;
+
     uint16_t clearRaw;
 	uint16_t redRaw;
 	uint16_t greenRaw;
