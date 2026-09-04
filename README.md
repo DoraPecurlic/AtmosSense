@@ -5,8 +5,8 @@
 ![C](https://img.shields.io/badge/Language-C-2EA44F)
 ![Python](https://img.shields.io/badge/Language-Python-3776AB)
 ![MQTT](https://img.shields.io/badge/Protocol-MQTT-7C3AED)
+![UART](https://img.shields.io/badge/Protocol-UART-F7931E)
 ![Docker](https://img.shields.io/badge/Infrastructure-Docker-2496ED)
-![ML](https://img.shields.io/badge/ML-scikit--learn-F7931E)
 ![Status](https://img.shields.io/badge/Status-In%20Progress-yellow)
 
 A modular embedded environmental monitoring system that combines STM32 firmware, local sensor visualization, serial telemetry, MQTT messaging, PostgreSQL storage, Grafana dashboards and machine-learning-based event detection.
