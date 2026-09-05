@@ -93,7 +93,7 @@ def create_air_feature_row( window: pd.DataFrame,) -> dict[str, float]:
 
     }
 
-def create_air_feature_table( data: pd.DataFrame, step_size = WINDOW_STEP) -> pd.date_range:
+def create_air_feature_table( data: pd.DataFrame, step_size = WINDOW_STEP) -> pd.DataFrame:
 
     #ciscenje podataka
     valid_data = filter_valid_air_rows(data)
