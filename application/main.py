@@ -8,6 +8,7 @@ from serial_connection import SerialConnection
 from serial_protocol import SerialProtocol
 
 from ml.air_predictor import AirPredictor
+from ml.light_predictor import LightPredictor
 
 DATA_FILE_PATH_CSV = (Path(__file__).resolve().parent.parent /"data" /"measurements.csv")
 
@@ -29,6 +30,7 @@ def main() -> None:
 
 
    air_predictor = AirPredictor()
+   light_predictor = LightPredictor()
 
    connection.connect()
 
@@ -63,6 +65,20 @@ def main() -> None:
                     f"{air_prediction.anomaly_votes}/"
                     f"{air_prediction.history_size}"
                 )
+           light_prediction = (light_predictor.add_reading(reading))
+           if light_prediction is not None:
+                print(
+                    f"Light model: "
+                    f"{light_prediction.status.upper()} | "
+                    f"current window: "
+                    f"{light_prediction.current_prediction.upper()} | "
+                    f"confidence: "
+                    f"{light_prediction.confidence:.2%} | "
+                    f"votes: "
+                    f"{light_prediction.winning_votes}/"
+                    f"{light_prediction.history_size}"
+                )
+            
            
    except KeyboardInterrupt:
         print("\nStopping AtmosSense gateway...")
