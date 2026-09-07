@@ -34,6 +34,8 @@ class SerialConnection:
             raise ConnectionError("Serial connection is not open")
 
         raw_message = self._serial.readline()
+
+        
       
         return raw_message.decode("ascii").rstrip("\r\n")
     
