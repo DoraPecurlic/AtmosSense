@@ -164,7 +164,7 @@ static const char *AirMlStatusToText( AirMlStatus status)
 	        return "NORMAL";
 
 	   case AIR_ML_CHANGE:
-	        return "CHANGE";
+	        return "ANOMALY";
 
 	   case AIR_ML_WAITING:
 	        default: return "WAITING";
