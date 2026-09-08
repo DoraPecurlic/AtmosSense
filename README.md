@@ -26,10 +26,11 @@ A machine-learning extension is currently being developed to detect unusual air-
 
 ### Local OLED Interface
 
-- Startup screen for the AtmosSense Edge device
+- Startup screen for the AtmosSense device
 - Environment page showing temperature, humidity, pressure and gas resistance
 - Light page showing clear, RGB and proximity values
-- Navigation between pages through the NUCLEO user button
+- ML status page showing current air and light condition
+- Navigation between pages through the user button
 
 ### Telemetry and Data Pipeline
 
@@ -58,6 +59,7 @@ A machine-learning extension is currently being developed to detect unusual air-
 - Filtering based on BME688 gas-valid and heater-stable flags
 - Overlapping time windows of 20 samples with a step of 5 samples
 - Isolation Forest pipeline trained on normal air sessions
+- Random Forest pipeline trained on different light sessions
 
 The air model detects whether a measurement window differs from learned normal conditions. It does not identify a particular gas or classify the exact source of an event.
 
@@ -69,9 +71,9 @@ The air model detects whether a measurement window differs from learned normal c
 
 | Module | Responsibility |
 | --- | --- |
-| `bme688_sensor` | Adapts the Bosch BME68x driver to STM32 HAL and provides compensated environmental readings |
+| `bme688_sensor` | Adapts the Bosch BME68x driver to STM32 HAL and provides environmental readings |
 | `apds9960` | Configures the optical sensor and reads clear, RGB and proximity data |
-| `display_view` | Renders the startup, environment and light pages on the OLED |
+| `display_view` | Renders the startup, environment and light and ml status pages on the OLED |
 | `serial_telemetry` | Encodes readings into the UART telemetry format and maintains the sequence number |
 | `main.c` | Initializes hardware, coordinates acquisition, changes display pages and transmits readings |
 | SSD1306 driver | Controls the OLED framebuffer and I2C communication |
@@ -90,6 +92,8 @@ The air model detects whether a measurement window differs from learned normal c
 | `air_features` | Cleans sensor data and creates window-based air features |
 | `train_air_model` | Trains and serializes the air anomaly-detection pipeline |
 | `evaluate_air_model` | Evaluates the model on sessions excluded from training |
+| `light_features` | Cleans sensor data and creates window-based light features |
+| `train_light_model` | Trains the light classification pipeline |
 
 
 ## Hardware
@@ -98,7 +102,7 @@ The air model detects whether a measurement window differs from learned normal c
 - BME688 environmental sensor
 - APDS-9960 RGB, ambient light and proximity sensor
 - SSD1306 0.96-inch OLED
-- Qwiic cables and jumper wires
+- Qwiic cables
 
 
 ## Author
