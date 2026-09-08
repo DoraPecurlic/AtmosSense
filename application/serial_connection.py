@@ -38,6 +38,19 @@ class SerialConnection:
         
       
         return raw_message.decode("ascii").rstrip("\r\n")
+
+
+    def write_line(self, message) -> None:
+        if not self.is_connected or self._serial is None:
+            raise ConnectionError("Serial connection is not open")
+
+        encoded_message = (f"{message}\n".encode("ascii"))
+
+        try:
+            self._serial.write(encoded_message)
+            self._serial.flush()
+        except:
+            raise ConnectionError("Could not send serial message.")
     
     def disconnect(self) -> None:
         if self._serial is not None and self._serial.is_open:

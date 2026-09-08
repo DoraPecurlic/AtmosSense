@@ -61,7 +61,7 @@ void DisplayView_ShowEnvironment(const SerialTelemetryReading *reading)
 	 ssd1306_WriteString("ENVIRONMENT", Font_6x8, White);
 
 	 ssd1306_SetCursor(110U, 0U);
-	 ssd1306_WriteString("1/2", Font_6x8, White);
+	 ssd1306_WriteString("1/3", Font_6x8, White);
 
 	 ssd1306_Line(0U, 10U, 127U, 10U, White);
 
@@ -109,7 +109,7 @@ void DisplayView_ShowLight(const SerialTelemetryReading *reading)
     ssd1306_WriteString("LIGHT", Font_6x8, White);
 
     ssd1306_SetCursor(110U, 0U);
-    ssd1306_WriteString("2/2", Font_6x8, White);
+    ssd1306_WriteString("2/3", Font_6x8, White);
 
     ssd1306_Line(0U, 10U, 127U, 10U, White);
 
@@ -140,7 +140,36 @@ void DisplayView_ShowLight(const SerialTelemetryReading *reading)
 
 }
 
+void DisplayView_ShowMlStatus(const char *airStatus, const char *lightStatus)
+{
+	char textBuffer[DISPLAY_TEXT_BUFFER_SIZE];
 
+	 if ((airStatus == NULL) || (lightStatus == NULL))
+	 {
+	        return;
+	 }
+
+	 ssd1306_Fill(Black);
+
+	 ssd1306_SetCursor(0U, 0U);
+	 ssd1306_WriteString("ML STATUS",Font_6x8,White);
+
+	 ssd1306_SetCursor(110U, 0U);
+	 ssd1306_WriteString("3/3", Font_6x8, White);
+
+	 ssd1306_Line(0U, 10U,127U,10U, White);
+	 snprintf(textBuffer, sizeof(textBuffer), "AIR: %s", airStatus);
+
+	 ssd1306_SetCursor(0U, 24U);
+     ssd1306_WriteString(textBuffer,Font_7x10,White);
+
+	 snprintf(textBuffer,sizeof(textBuffer),"LIGHT: %s", lightStatus);
+
+	 ssd1306_SetCursor(0U, 43U);
+	 ssd1306_WriteString(textBuffer,Font_6x8,White);
+
+	 ssd1306_UpdateScreen();
+}
 
 
 

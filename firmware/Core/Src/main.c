@@ -27,6 +27,7 @@
 #include "apds9960.h"
 
 #include <stdio.h>
+#include <string.h>
 /* USER CODE END Includes */
 
 /* Private typedef -----------------------------------------------------------*/
@@ -34,8 +35,24 @@
 typedef enum
 {
 	DISPLAY_PAGE_ENVIRONMENT = 0,
-	DISPLAY_PAGE_LIGHT
+	DISPLAY_PAGE_LIGHT,
+	DISPLAY_PAGE_ML
 }DisplayPage;
+
+typedef enum
+{
+    AIR_ML_WAITING = 0,
+    AIR_ML_NORMAL,
+    AIR_ML_CHANGE
+} AirMlStatus;
+
+typedef enum
+{
+    LIGHT_ML_WAITING = 0,
+    LIGHT_ML_DARK,
+    LIGHT_ML_DAYLIGHT,
+    LIGHT_ML_ARTIFICIAL
+} LightMlStatus;
 
 /* USER CODE END PTD */
 
@@ -59,7 +76,7 @@ UART_HandleTypeDef huart2;
 
 /* USER CODE BEGIN PV */
 #define TELEMETRY_MESSAGE_BUFFER_SIZE 128U
-
+#define ML_COMMAND_BUFFER_SIZE 32U
 
 static SerialTelemetryReading telemetryReading =
 {
@@ -83,6 +100,18 @@ static BME688Reading bme688Reading;
 
 static volatile DisplayPage currentPage = DISPLAY_PAGE_ENVIRONMENT;
 
+static uint8_t mlReceiveByte = 0U;
+static char mlCommandBuffer[ML_COMMAND_BUFFER_SIZE];
+
+static uint8_t mlCommandLength = 0U;
+static volatile AirMlStatus airMlStatus = AIR_ML_WAITING;
+static volatile LightMlStatus lightMlStatus = LIGHT_ML_WAITING;
+
+
+
+
+
+
 /* USER CODE END PV */
 
 /* Private function prototypes -----------------------------------------------*/
@@ -91,11 +120,78 @@ static void MX_GPIO_Init(void);
 static void MX_I2C1_Init(void);
 static void MX_USART2_UART_Init(void);
 /* USER CODE BEGIN PFP */
+static void ProcessMlCommand(const char *command);
+static const char *AirMlStatusToText( AirMlStatus status);
+static const char *LightMlStatusToText(LightMlStatus status);
+
 
 /* USER CODE END PFP */
 
 /* Private user code ---------------------------------------------------------*/
 /* USER CODE BEGIN 0 */
+
+
+static void ProcessMlCommand(const char *command)
+{
+	if(strcmp(command, "AIR:NORMAL") == 0)
+	{
+	   airMlStatus = AIR_ML_NORMAL;
+	}
+	else if(strcmp(command, "AIR:DETECTED ANOMALY") == 0)
+	{
+	   airMlStatus = AIR_ML_CHANGE;
+	}
+	else if(strcmp(command, "LIGHT:DARK") == 0)
+	{
+	   lightMlStatus = LIGHT_ML_DARK;
+	}
+	else if(strcmp(command, "LIGHT:DAYLIGHT") == 0)
+	{
+	   lightMlStatus =LIGHT_ML_DAYLIGHT;
+	}
+	else if(strcmp(command,"LIGHT:ARTIFICIAL") == 0)
+    {
+	   lightMlStatus = LIGHT_ML_ARTIFICIAL;
+	}
+
+}
+
+static const char *AirMlStatusToText( AirMlStatus status)
+{
+	switch (status)
+	{
+	   case AIR_ML_NORMAL:
+	        return "NORMAL";
+
+	   case AIR_ML_CHANGE:
+	        return "CHANGE";
+
+	   case AIR_ML_WAITING:
+	        default: return "WAITING";
+	}
+}
+
+static const char *LightMlStatusToText(LightMlStatus status)
+{
+	switch (status)
+	{
+	   case LIGHT_ML_DARK:
+	        return "DARK";
+
+	   case LIGHT_ML_DAYLIGHT:
+	        return "DAYLIGHT";
+
+	   case LIGHT_ML_ARTIFICIAL:
+	        return "ARTIFICIAL";
+
+	   case LIGHT_ML_WAITING:
+	        default:return "WAITING";
+	}
+}
+
+
+
+
 /* USER CODE END 0 */
 
 /**
@@ -132,6 +228,10 @@ int main(void)
   /* USER CODE BEGIN 2 */
   SerialTelemetry_Init(&huart2);
 
+  if(HAL_UART_Receive_IT(&huart2,&mlReceiveByte,1U) != HAL_OK)
+  {
+      Error_Handler();
+  }
 
 
   if (BME688Sensor_Init(&hi2c1) != HAL_OK)
@@ -218,10 +318,15 @@ int main(void)
     {
     	DisplayView_ShowEnvironment(&telemetryReading);
     }
-    else
+    else if(currentPage == DISPLAY_PAGE_LIGHT)
     {
     	DisplayView_ShowLight(&telemetryReading);
     }
+    else
+    {
+    	DisplayView_ShowMlStatus(AirMlStatusToText(airMlStatus), LightMlStatusToText(lightMlStatus));
+    }
+
     if (SerialTelemetry_Send(&telemetryReading) != HAL_OK)
     {
     	Error_Handler();
@@ -394,11 +499,51 @@ void HAL_GPIO_EXTI_Callback(uint16_t GPIO_Pin)
 	{
 	    currentPage = DISPLAY_PAGE_LIGHT;
 	}
+	else if(currentPage == DISPLAY_PAGE_LIGHT)
+	{
+		currentPage = DISPLAY_PAGE_ML;
+	}
 	else
 	{
 	    currentPage = DISPLAY_PAGE_ENVIRONMENT;
 	}
 
+}
+
+void HAL_UART_RxCpltCallback(UART_HandleTypeDef *huart)
+{
+	if (huart != &huart2)
+	{
+	    return;
+	}
+
+	if (mlReceiveByte == '\n')
+	{
+	   mlCommandBuffer[mlCommandLength] = '\0';
+
+	   ProcessMlCommand(mlCommandBuffer);
+
+	   mlCommandLength = 0U;
+	}
+	else if (mlReceiveByte != '\r')
+	{
+		if(mlCommandLength < (ML_COMMAND_BUFFER_SIZE - 1U))
+		{
+			mlCommandBuffer[mlCommandLength] = (char)mlReceiveByte;
+			mlCommandLength++;
+		}
+		else
+		{
+			mlCommandLength = 0U;
+		}
+
+	}
+
+
+	if(HAL_UART_Receive_IT(&huart2,&mlReceiveByte,1U) != HAL_OK)
+	{
+		 Error_Handler();
+	}
 }
 /* USER CODE END 4 */
 
