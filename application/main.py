@@ -31,6 +31,8 @@ def main() -> None:
 
    air_predictor = AirPredictor()
    light_predictor = LightPredictor()
+   last_sent_air_status = None
+   last_sent_light_status = None
 
    connection.connect()
 
@@ -65,6 +67,22 @@ def main() -> None:
                     f"{air_prediction.anomaly_votes}/"
                     f"{air_prediction.history_size}"
                 )
+
+                air_status_for_display = None
+                if air_prediction.status == "NORMAL":
+                    air_status_for_display = "NORMAL"
+                elif air_prediction.status == "AIR_CHANGE":
+                    air_status_for_display ="DETECTED ANOMALY"
+
+                if (air_status_for_display is not None and air_status_for_display != last_sent_air_status):
+                    connection.write_line(f"AIR:{air_status_for_display}")
+
+                    last_sent_air_status = air_status_for_display
+                    print(
+                        f"Sent to STM32: "
+                        f"air:{air_status_for_display}"
+                    )
+
            light_prediction = (light_predictor.add_reading(reading))
            if light_prediction is not None:
                 print(
@@ -78,6 +96,23 @@ def main() -> None:
                     f"{light_prediction.winning_votes}/"
                     f"{light_prediction.history_size}"
                 )
+
+                light_status_for_dispay = light_prediction.status.upper()
+                light_statuses = {
+                    "DARK",
+                    "DAYLIGHT",
+                    "ARTIFICIAL",
+                }
+                if(light_status_for_dispay in light_statuses and light_status_for_dispay != last_sent_light_status):
+                    connection.write_line(f"LIGHT:{light_status_for_dispay}")
+
+                    last_sent_light_status = light_status_for_dispay
+                    print(
+                        f"Sent to STM32: "
+                        f"LIGHT:{light_status_for_dispay}"
+                    )
+                
+
             
            
    except KeyboardInterrupt:
