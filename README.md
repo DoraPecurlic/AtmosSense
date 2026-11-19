@@ -51,8 +51,7 @@ A machine-learning extension is developed to detect unusual air-condition change
 - Persistent Docker volumes for broker, database and dashboard data
 - Grafana dashboard definition included in the repository
 
-### Machine Learning — In Progress
-
+### Machine Learning
 - Command-line collector for labeled air and light sessions
 - Air labels: `normal`, `perfume`, `alcohol` and `heat`
 - Light labels: `dark`, `daylight` and `artificial`
