@@ -13,7 +13,7 @@ A modular embedded environmental monitoring system that combines STM32 firmware,
 
 The STM32 collects environmental and optical measurements from BME688 and APDS-9960 sensors, displays live readings on an SSD1306 OLED and transmits structured telemetry over UART. A Python gateway validates the serial data, stores a local CSV copy and publishes each reading to MQTT. A containerized consumer then writes the measurements to PostgreSQL for visualization in Grafana.
 
-A machine-learning extension is currently being developed to detect unusual air-condition changes and classify light conditions from labeled sensor sessions.
+A machine-learning extension is developed to detect unusual air-condition changes and classify light conditions from labeled sensor sessions.
 
 ## Features
 
